@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CargoExpreso.App.Views.RegistroPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Primary}">
+
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Header -->
+            <VerticalStackLayout Padding="32,48,32,24" Spacing="4" HorizontalOptions="Center">
+                <Label Text="CARGO EXPRESO"
+                       FontSize="22" FontAttributes="Bold"
+                       TextColor="{StaticResource TextOnPrimary}"
+                       HorizontalOptions="Center"
+                       CharacterSpacing="3"/>
+                <Label Text="Crea tu cuenta y empieza a ganar puntos"
+                       Style="{StaticResource HeaderSubLabel}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Registration card -->
+            <Border Style="{StaticResource Card}" Margin="16,0,16,24">
+                <VerticalStackLayout Spacing="16">
+
+                    <Label Text="Datos personales" Style="{StaticResource PageTitle}" FontSize="20"/>
+
+                    <!-- Identity -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Número de Identidad *" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                        <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                            <Entry Placeholder="0801-1990-12345"
+                                   Text="{Binding IdentityNumber}"
+                                   Style="{StaticResource StyledEntry}"
+                                   Keyboard="Text"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- First + Last name row -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <VerticalStackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="Nombre *" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                            <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                                <Entry Placeholder="Juan"
+                                       Text="{Binding FirstName}"
+                                       Style="{StaticResource StyledEntry}"/>
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="Apellido *" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                            <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                                <Entry Placeholder="Pérez"
+                                       Text="{Binding LastName}"
+                                       Style="{StaticResource StyledEntry}"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Phone -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Teléfono *" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                        <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                            <Entry Placeholder="9999-1234"
+                                   Text="{Binding Phone}"
+                                   Style="{StaticResource StyledEntry}"
+                                   Keyboard="Telephone"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Email (optional) -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Correo electrónico (opcional)" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                        <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                            <Entry Placeholder="correo@ejemplo.com"
+                                   Text="{Binding Email}"
+                                   Style="{StaticResource StyledEntry}"
+                                   Keyboard="Email"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Bonus preview -->
+                    <Border BackgroundColor="{StaticResource SuccessLight}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="14,10">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="🎁" FontSize="16" VerticalOptions="Center"/>
+                            <Label Text="{Binding BonusPreview}"
+                                   TextColor="{StaticResource Success}"
+                                   FontSize="13"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Error / Success -->
+                    <Border BackgroundColor="{StaticResource ErrorLight}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="12,8"
+                            IsVisible="{Binding ErrorMessage, Converter={StaticResource NotEmptyConverter}}">
+                        <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" HorizontalTextAlignment="Start"/>
+                    </Border>
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="{StaticResource Primary}"
+                                       HeightRequest="36"/>
+
+                    <Button Text="Crear mi cuenta"
+                            Command="{Binding RegisterCommand}"
+                            Style="{StaticResource AccentButton}"
+                            IsEnabled="{Binding IsNotBusy}"/>
+
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                        <Label Text="¿Ya tienes cuenta?" Style="{StaticResource BodyLabel}"/>
+                        <Label Text="Ingresar"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="14"
+                               FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding GoToLoginCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

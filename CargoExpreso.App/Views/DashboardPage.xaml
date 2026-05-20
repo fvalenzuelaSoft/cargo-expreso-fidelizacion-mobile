@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:CargoExpreso.App.Models"
+             xmlns:conv="clr-namespace:CargoExpreso.App.Converters"
+             x:Class="CargoExpreso.App.Views.DashboardPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <ContentPage.Resources>
+        <conv:TransactionTypeToColorConverter x:Key="CreditColorConverter"/>
+    </ContentPage.Resources>
+
+    <RefreshView Command="{Binding RefreshCommand}"
+                 IsRefreshing="{Binding IsRefreshing}">
+        <ScrollView VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ── Header ── -->
+                <Grid BackgroundColor="{StaticResource Primary}"
+                      Padding="24,52,24,72"
+                      ColumnDefinitions="*,Auto">
+
+                    <VerticalStackLayout Grid.Column="0" Spacing="3">
+                        <Label Text="{Binding CustomerName, StringFormat='¡Hola, {0}!'}"
+                               Style="{StaticResource HeaderLabel}"/>
+                        <Label Text="Tu saldo de puntos disponible"
+                               Style="{StaticResource HeaderSubLabel}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Logout button -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#FFFFFF22"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="10,8"
+                            VerticalOptions="Center">
+                        <Label Text="Salir"
+                               TextColor="{StaticResource TextOnPrimary}"
+                               FontSize="13"
+                               FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LogoutCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Border>
+                </Grid>
+
+                <!-- ── Balance card (overlaps header) ── -->
+                <Border Style="{StaticResource Card}"
+                        Margin="20,-48,20,0">
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           IsVisible="{Binding IsBusy}"
+                                           Color="{StaticResource Primary}"
+                                           HeightRequest="32"/>
+
+                        <Label Text="{Binding BalanceDisplay}"
+                               FontSize="54"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding IsNotBusy}"/>
+
+                        <Label Text="puntos disponibles"
+                               Style="{StaticResource BodyLabel}"
+                               HorizontalOptions="Center"/>
+
+                        <Border BackgroundColor="{StaticResource WarningLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 6"
+                                Padding="10,4"
+                                HorizontalOptions="Center"
+                                IsVisible="{Binding CanRedeem, Converter={StaticResource InvertBoolConverter}}">
+                            <Label Text="Necesitas mínimo 200 puntos para canjear"
+                                   TextColor="{StaticResource Warning}"
+                                   FontSize="11"/>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Quick Actions ── -->
+                <Grid Margin="20,20,20,0"
+                      ColumnDefinitions="*,*"
+                      ColumnSpacing="12">
+
+                    <!-- Scan guide -->
+                    <Border Grid.Column="0" Style="{StaticResource Card}" Padding="16">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Label Text="📦" FontSize="36" HorizontalOptions="Center"/>
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="Escanear Guía"
+                                       Style="{StaticResource SectionTitle}"
+                                       HorizontalOptions="Center"
+                                       FontSize="14"/>
+                                <Label Text="Acumula puntos"
+                                       Style="{StaticResource CaptionLabel}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <Button Text="Escanear"
+                                    Command="{Binding ScanGuideCommand}"
+                                    Style="{StaticResource PrimaryButton}"
+                                    HeightRequest="40"
+                                    FontSize="14"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Redeem -->
+                    <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                            <Label Text="🎁" FontSize="36" HorizontalOptions="Center"/>
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="Canjear Puntos"
+                                       Style="{StaticResource SectionTitle}"
+                                       HorizontalOptions="Center"
+                                       FontSize="14"/>
+                                <Label Text="Genera tu QR"
+                                       Style="{StaticResource CaptionLabel}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <Button Text="Canjear"
+                                    Command="{Binding RedeemCommand}"
+                                    Style="{StaticResource AccentButton}"
+                                    HeightRequest="40"
+                                    FontSize="14"
+                                    IsEnabled="{Binding CanRedeem}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ── Recent transactions ── -->
+                <Border Style="{StaticResource Card}" Margin="20,16,20,24">
+                    <VerticalStackLayout Spacing="14">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="Últimos movimientos"
+                                   Style="{StaticResource SectionTitle}"/>
+                            <Label Grid.Column="1"
+                                   Text="Ver historial"
+                                   TextColor="{StaticResource Accent}"
+                                   FontSize="13"
+                                   FontAttributes="Bold">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ViewHistoryCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
+
+                        <!-- Empty state -->
+                        <Label Text="Sin movimientos aún. ¡Escanea tu primera guía!"
+                               Style="{StaticResource BodyLabel}"
+                               HorizontalOptions="Center"
+                               Padding="0,8"
+                               IsVisible="{Binding HasRecentTransactions, Converter={StaticResource InvertBoolConverter}}"/>
+
+                        <CollectionView ItemsSource="{Binding RecentTransactions}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:PointsTransaction">
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          Padding="0,6"
+                                          ColumnSpacing="12">
+
+                                        <!-- Icon -->
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="{StaticResource InputBackground}"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 10"
+                                                WidthRequest="40" HeightRequest="40">
+                                            <Label Text="{Binding IsCredit, Converter={StaticResource TransactionTypeToIconConverter}}"
+                                                   FontSize="18"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   TextColor="{Binding IsCredit, Converter={StaticResource CreditColorConverter}}"/>
+                                        </Border>
+
+                                        <!-- Info -->
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding TransactionType}"
+                                                   FontSize="13"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}"/>
+                                            <Label Text="{Binding TransactionDate, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                                   Style="{StaticResource CaptionLabel}"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Points -->
+                                        <Label Grid.Column="2"
+                                               Text="{Binding PointsDisplay}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               TextColor="{Binding IsCredit, Converter={StaticResource CreditColorConverter}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

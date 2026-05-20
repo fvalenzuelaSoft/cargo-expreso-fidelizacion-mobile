@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CargoExpreso.App.Views.CanjePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              BackgroundColor="{StaticResource Primary}"
+              Padding="20,48,20,20"
+              ColumnDefinitions="Auto,*">
+            <Label Grid.Column="0"
+                   Text="←"
+                   FontSize="22"
+                   TextColor="White"
+                   VerticalOptions="Center"
+                   Margin="0,0,12,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                <Label Text="Canjear Puntos" Style="{StaticResource HeaderLabel}"/>
+                <Label Text="{Binding AvailableBalance, StringFormat='Disponible: {0:N0} puntos'}"
+                       Style="{StaticResource HeaderSubLabel}"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="20" Spacing="16">
+
+                <!-- ── Form (visible when no QR) ── -->
+                <Border Style="{StaticResource Card}"
+                        IsVisible="{Binding ShowQr, Converter={StaticResource InvertBoolConverter}}">
+                    <VerticalStackLayout Spacing="18">
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="¿Cuántos puntos deseas canjear?"
+                                   Style="{StaticResource SectionTitle}"/>
+                            <Label Text="El valor mínimo de canje está configurado por la empresa"
+                                   Style="{StaticResource BodyLabel}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Amount input -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Monto en puntos" FontSize="13" Style="{StaticResource SectionTitle}"/>
+                            <Border Style="{StaticResource InputBorder}" HeightRequest="56">
+                                <Entry Placeholder="Ej: 500"
+                                       Text="{Binding AmountText}"
+                                       Style="{StaticResource StyledEntry}"
+                                       Keyboard="Numeric"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       ReturnType="Done"
+                                       ReturnCommand="{Binding GenerateQrCommand}"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Error -->
+                        <Border BackgroundColor="{StaticResource ErrorLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="12,8"
+                                IsVisible="{Binding ErrorMessage, Converter={StaticResource NotEmptyConverter}}">
+                            <Label Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" HorizontalTextAlignment="Start"/>
+                        </Border>
+
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           IsVisible="{Binding IsBusy}"
+                                           Color="{StaticResource Primary}"
+                                           HeightRequest="36"/>
+
+                        <Button Text="Generar código QR"
+                                Command="{Binding GenerateQrCommand}"
+                                Style="{StaticResource AccentButton}"
+                                IsEnabled="{Binding IsNotBusy}"/>
+
+                        <!-- Info box -->
+                        <Border BackgroundColor="{StaticResource InfoLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="14,12">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="ℹ Cómo funciona"
+                                       FontSize="13"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Info}"/>
+                                <Label Text="1. Ingresa el monto de puntos a canjear"
+                                       Style="{StaticResource CaptionLabel}"/>
+                                <Label Text="2. Genera el QR y preséntalo en caja"
+                                       Style="{StaticResource CaptionLabel}"/>
+                                <Label Text="3. El cajero lo escaneará para aplicar el descuento"
+                                       Style="{StaticResource CaptionLabel}"/>
+                                <Label Text="4. El QR tiene tiempo de validez limitado"
+                                       Style="{StaticResource CaptionLabel}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── QR Display (visible when ShowQr = true) ── -->
+                <Border Style="{StaticResource Card}"
+                        IsVisible="{Binding ShowQr}">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+
+                        <Label Text="Presenta este código en caja"
+                               Style="{StaticResource SectionTitle}"
+                               HorizontalOptions="Center"/>
+
+                        <!-- QR image -->
+                        <Border BackgroundColor="White"
+                                StrokeThickness="2"
+                                Stroke="{StaticResource DividerColor}"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="16"
+                                HorizontalOptions="Center">
+                            <Image Source="{Binding QrImageSource}"
+                                   WidthRequest="220"
+                                   HeightRequest="220"
+                                   Aspect="AspectFit"/>
+                        </Border>
+
+                        <!-- Amount -->
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding GeneratedAmount, StringFormat='{0:N0} puntos'}"
+                                   FontSize="32"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="a descontar"
+                                   Style="{StaticResource BodyLabel}"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <!-- Countdown -->
+                        <Border BackgroundColor="{StaticResource WarningLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="16,10"
+                                HorizontalOptions="Fill">
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label Text="{Binding TimeRemaining}"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Warning}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="{Binding ExpiryInfo}"
+                                       Style="{StaticResource CaptionLabel}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Button Text="Generar nuevo QR"
+                                Command="{Binding NewQrCommand}"
+                                Style="{StaticResource OutlineButton}"/>
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

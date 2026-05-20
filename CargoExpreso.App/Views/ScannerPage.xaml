@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="CargoExpreso.App.Views.ScannerPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Primary}">
+
+    <Grid>
+
+        <!-- ── Camera scanner (shown when IsScanning = true) ── -->
+        <Grid IsVisible="{Binding IsScanning}">
+
+            <zxing:CameraBarcodeReaderView x:Name="BarcodeReader"
+                                           BarcodesDetected="BarcodeReader_BarcodesDetected"/>
+
+            <!-- Top bar -->
+            <Grid VerticalOptions="Start"
+                  BackgroundColor="#CC000000"
+                  Padding="20,44,20,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0"
+                       Text="←"
+                       FontSize="22"
+                       TextColor="White"
+                       VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="1"
+                       Text="Escanear Guía"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <!-- Bottom: hint + manual entry -->
+            <VerticalStackLayout VerticalOptions="End"
+                                 BackgroundColor="#CC000000"
+                                 Padding="24,20"
+                                 Spacing="14">
+
+                <Label Text="Apunta la cámara al código de barras o QR de tu guía"
+                       TextColor="White"
+                       FontSize="14"
+                       HorizontalTextAlignment="Center"/>
+
+                <Label Text="─── o ingresa manualmente ───"
+                       TextColor="#AABBCC"
+                       FontSize="12"
+                       HorizontalOptions="Center"/>
+
+                <Border BackgroundColor="#FFFFFF22"
+                        StrokeThickness="1"
+                        Stroke="White"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="14,0"
+                        HeightRequest="48">
+                    <Entry Placeholder="Número de guía"
+                           Text="{Binding ShipmentNumber}"
+                           PlaceholderColor="#AABBCC"
+                           TextColor="White"
+                           BackgroundColor="Transparent"
+                           Keyboard="Text"
+                           ReturnType="Done"
+                           ReturnCommand="{Binding ProcessCommand}"/>
+                </Border>
+
+                <Button Text="Procesar guía manualmente"
+                        Command="{Binding ProcessCommand}"
+                        BackgroundColor="{StaticResource Accent}"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="46"
+                        IsEnabled="{Binding IsNotBusy}"/>
+
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- ── Processing / Result view ── -->
+        <Grid IsVisible="{Binding IsScanning, Converter={StaticResource InvertBoolConverter}}"
+              BackgroundColor="{StaticResource Primary}">
+
+            <VerticalStackLayout Padding="36"
+                                 Spacing="24"
+                                 VerticalOptions="Center">
+
+                <!-- Back -->
+                <Label Text="← Volver"
+                       TextColor="#AABBCC"
+                       FontSize="15"
+                       HorizontalOptions="Start">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <!-- Loading -->
+                <VerticalStackLayout IsVisible="{Binding IsBusy}"
+                                     HorizontalOptions="Center"
+                                     Spacing="16">
+                    <ActivityIndicator IsRunning="True"
+                                       Color="White"
+                                       WidthRequest="60"
+                                       HeightRequest="60"/>
+                    <Label Text="Procesando guía..."
+                           TextColor="White"
+                           FontSize="16"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- Result -->
+                <VerticalStackLayout IsVisible="{Binding ShowResult}"
+                                     Spacing="20"
+                                     HorizontalOptions="Center">
+
+                    <!-- Success -->
+                    <VerticalStackLayout IsVisible="{Binding ResultIsSuccess}" Spacing="16" HorizontalOptions="Center">
+                        <Border BackgroundColor="{StaticResource SuccessLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 50"
+                                WidthRequest="90" HeightRequest="90">
+                            <Label Text="✓"
+                                   FontSize="48"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Success}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Border>
+                        <Label Text="{Binding ResultTitle}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding ResultDetail}"
+                               TextColor="#BBCDE5"
+                               FontSize="15"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Error -->
+                    <VerticalStackLayout IsVisible="{Binding ResultIsSuccess, Converter={StaticResource InvertBoolConverter}}"
+                                         Spacing="16" HorizontalOptions="Center">
+                        <Border BackgroundColor="{StaticResource ErrorLight}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 50"
+                                WidthRequest="90" HeightRequest="90">
+                            <Label Text="✗"
+                                   FontSize="48"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource Accent}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Border>
+                        <Label Text="{Binding ResultTitle}"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding ResultDetail}"
+                               TextColor="#BBCDE5"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Actions -->
+                    <Button Text="Escanear otra guía"
+                            Command="{Binding ScanAnotherCommand}"
+                            Style="{StaticResource OutlineButton}"
+                            BorderColor="White"
+                            TextColor="White"
+                            Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+</ContentPage>

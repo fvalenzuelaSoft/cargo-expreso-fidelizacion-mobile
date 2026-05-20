@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CargoExpreso.App.Views.LoginPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Primary}">
+
+    <ScrollView VerticalScrollBarVisibility="Never">
+        <Grid RowDefinitions="Auto,*,Auto" MinimumHeightRequest="600">
+
+            <!-- Header branding -->
+            <VerticalStackLayout Grid.Row="0" Padding="32,60,32,32" Spacing="6" HorizontalOptions="Center">
+                <Label Text="CARGO EXPRESO"
+                       FontSize="26" FontAttributes="Bold"
+                       TextColor="{StaticResource TextOnPrimary}"
+                       HorizontalOptions="Center"
+                       CharacterSpacing="3"/>
+                <Label Text="Programa de Puntos"
+                       Style="{StaticResource HeaderSubLabel}"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Login card -->
+            <Border Grid.Row="1"
+                    Style="{StaticResource Card}"
+                    Margin="20,0"
+                    VerticalOptions="Center">
+                <VerticalStackLayout Spacing="20">
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Bienvenido" Style="{StaticResource PageTitle}"/>
+                        <Label Text="Ingresa con tu número de identidad y teléfono"
+                               Style="{StaticResource BodyLabel}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Identity Number -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Número de Identidad" Style="{StaticResource SectionTitle}" FontSize="13"/>
+                        <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                            <Entry Placeholder="Ej: 0801-1990-12345"
+                                   Text="{Binding IdentityNumber}"
+                                   Style="{StaticResource StyledEntry}"
+                                   Keyboard="Text"
+                                   ReturnType="Next"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Phone -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Teléfono" Style="{StaticResource SectionTitle}" FontSize="13"/>
+                        <Border Style="{StaticResource InputBorder}" HeightRequest="52">
+                            <Entry Placeholder="Ej: 9999-1234"
+                                   Text="{Binding Phone}"
+                                   Style="{StaticResource StyledEntry}"
+                                   Keyboard="Telephone"
+                                   ReturnType="Done"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Error message -->
+                    <Border BackgroundColor="{StaticResource ErrorLight}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="12,8"
+                            IsVisible="{Binding ErrorMessage, Converter={StaticResource NotEmptyConverter}}">
+                        <Label Text="{Binding ErrorMessage}"
+                               Style="{StaticResource ErrorLabel}"
+                               HorizontalTextAlignment="Start"/>
+                    </Border>
+
+                    <!-- Busy indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="{StaticResource Primary}"
+                                       HeightRequest="36"/>
+
+                    <!-- Login button -->
+                    <Button Text="Iniciar Sesión"
+                            Command="{Binding LoginCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding IsNotBusy}"/>
+
+                    <!-- Register link -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                        <Label Text="¿No tienes cuenta?" Style="{StaticResource BodyLabel}"/>
+                        <Label Text="Regístrate"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="14"
+                               FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding GoToRegisterCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Footer -->
+            <Label Grid.Row="2"
+                   Text="© 2025 Cargo Expreso"
+                   Style="{StaticResource CaptionLabel}"
+                   TextColor="#BBCDE5"
+                   HorizontalOptions="Center"
+                   Margin="0,24,0,32"/>
+
+        </Grid>
+    </ScrollView>
+</ContentPage>

@@ -5,6 +5,7 @@ obj/
 *.suo
 .vs/
 *.DotSettings.user
+*.proj.Backup.tmp
 
 # ── ASP.NET Core ──────────────────────────────────────────────────────────
 appsettings.Production.json
